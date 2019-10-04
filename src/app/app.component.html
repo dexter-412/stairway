@@ -1,0 +1,82 @@
+<h1>Graphing the exchange rate</h1>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-6">
+                    <form action="" class="form-group" [formGroup]="formStartYear" (ngSubmit)="submitYear()">
+                        <div class="mb-1">
+                            <label for="year">Enter start year</label>
+                            <input class="form-control" type="text" id="year" formControlName="year">
+                            <div class="error-text" *ngIf="formStartYear.get('year').invalid && formStartYear.get('year').touched">
+                                <span *ngIf="formStartYear.get('year').errors['required'] && formStartYear.get('year').errors['hasError']">Field is required</span>
+                                <span *ngIf="!formStartYear.get('year').errors['required'] && formStartYear.get('year').errors['hasError']">Wrong format</span>
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <input type="submit" value="submit" class="btn btn-primary" [disabled]="formStartYear.invalid">
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6" *ngIf="startYear">Chosen year: {{ startYear }} </div>
+            </div>
+        </div>
+        <div class="col-md-6" *ngIf="startYear">
+            <div class="row">
+                <div class="col-md-6">
+                    <form action="" class="form-group" [formGroup]="chartDataFields" (ngSubmit)="submitChartDataFields()">
+                        <div class="mb-1">
+                            <label for="year">Enter currency name </label>
+                            <input class="form-control" type="text" id="year" formControlName="currencyName">
+                            <div class="error-text" *ngIf="chartDataFields.get('currencyName').invalid && chartDataFields.get('currencyName').touched">
+                                <span *ngIf="chartDataFields.get('currencyName').errors['required'] && chartDataFields.get('currencyName').errors['hasError']">
+                                 Field is required
+                                </span>
+                                <span *ngIf="!chartDataFields.get('currencyName').errors['required'] && chartDataFields.get('currencyName').errors['hasError']">
+                                 Value must be a number
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <label for="year">Enter currency value sharing "," </label>
+                            <input class="form-control" type="text" id="year" formControlName="currencyValue">
+                            <div class="error-text" *ngIf="chartDataFields.get('currencyValue').invalid && chartDataFields.get('currencyValue').touched">
+                                <span *ngIf="chartDataFields.get('currencyValue').errors['required'] && chartDataFields.get('currencyValue').errors['hasError']">
+                                 Field is required
+                                </span>
+                                <span *ngIf="!chartDataFields.get('currencyValue').errors['required'] && chartDataFields.get('currencyValue').errors['hasError']">
+                                 Value must be a number
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <input type="submit" value="submit" class="btn btn-primary" [disabled]="chartDataFields.invalid">
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <div class="list-group-item" *ngFor="let item of chartData; let i = index">
+                        <h5>{{ item.label }} <a (click)="deleteItem(i)">X</a></h5>
+                        <ul>
+                            <li *ngFor="let value of item['data']">
+                                {{ value }},
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <canvas baseChart
+    [datasets]="chartData"
+     [labels]="chartLabels"
+     [options]="chartOptions"
+     [legend]="chartLegend"
+     [chartType]="chartType"
+     ></canvas>
+</div>
