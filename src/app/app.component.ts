@@ -9,33 +9,17 @@ import {checkForNumber, checkForYear} from "./validators/validators";
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent  implements AfterViewInit {
+export class AppComponent {
   public startYear: number;
 
   public currentYear = new Date().getFullYear();
 
-  public chartOptions = {
-    scaleShowVerticalLines: false,
-    responsive: true
-  };
+  public chartLabels: Array<string>;
 
-  public chartLabels: Array<string> = ['2013', '2014', '2015', '2016', '2017', '2018', '2019'];
+  public chartData: Array<object> = [];
 
-  public chartType: string = 'line';
 
-  public chartLegend: boolean = true;
-
-  public chartData: Array<object> = [
-    {
-      data: [52,25,25,25,25,26,27],
-      label: 'Dollar',
-      fill: false
-    }
-  ];
-
-  ngAfterViewInit() {
-    this.chartData.splice(0,1);
-  }
+  myChart: any;
 
   formStartYear  = new FormGroup({
     year: new FormControl('', [Validators.required, checkForYear])
@@ -43,10 +27,12 @@ export class AppComponent  implements AfterViewInit {
 
   submitYear(): void {
     this.chartLabels = [];
-    this.startYear = this.formStartYear.value.year
+    this.startYear = this.formStartYear.value.year;
     for (let i = this.startYear; i <= this.currentYear; i++ ) {
       this.chartLabels.push(i.toString())
     }
+
+    this.generateChart();
   }
 
   chartDataFields  = new FormGroup({
@@ -55,16 +41,49 @@ export class AppComponent  implements AfterViewInit {
   });
 
   submitChartDataFields(): void {
+    const color = this.setColor();
     this.chartData.push({
       data: this.chartDataFields.value.currencyValue.split(','),
       label: this.chartDataFields.value.currencyName,
-      fill: false
+      fill: false,
+      backgroundColor: `${color}, 1)`,
+      borderColor: `${color}, .7)`,
+      pointBackgroundColor: `${color}, 1)`
     });
+    this.myChart.update();
     this.chartDataFields.reset();
+  }
+
+  setColor(): string {
+    const colorFirst = Math.floor(Math.random()*256);
+    const colorSec = Math.floor(Math.random()*256);
+    const colorTh = Math.floor(Math.random()*256);
+    return `rgba(${colorFirst}, ${colorSec}, ${colorTh}`;
   }
 
   deleteItem(index): void {
       this.chartData.splice(index,1);
+      this.myChart.update();
   }
 
+
+  generateChart():void {
+   this.myChart = new Chart('canvas', {
+      type: 'line',
+      data: {
+        labels: this.chartLabels,
+        datasets:  this.chartData
+      },
+      options: {
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true
+            }
+          }]
+        },
+        responsive: true
+      }
+    });
+  }
 }
